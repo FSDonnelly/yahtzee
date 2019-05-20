@@ -59,14 +59,25 @@ class SumDistro extends Rule {
 
 class FullHouse extends Rule {
   evalRoll = dice => {
-    return this.freq(dice)[0] === (3 && 2) ? this.score : 0;
+    const freqs = this.freq(dice);
+    return (freqs.includes(2) && freqs.includes(3)) ? this.score : 0;
   }
 }
 
 /** Check for small straights. */
 
-class SmallStraight {
-  // TODO
+class SmallStraight extends Rule {
+  evalRoll = dice => {
+    const d = new Set(dice);
+    // small straight must be 4 different dice & only one can be a 1 or a 6
+    if (d.has(2) && d.has(3) && d.has(4) && (d.has(1) || d.has(5)))
+      return this.score;
+
+    if (d.has(3) && d.has(4) && d.has(5) && (d.has(2) || d.has(6)))
+      return this.score;
+
+    return 0;
+  }
 }
 
 /** Check for large straights. */
@@ -76,7 +87,7 @@ class LargeStraight extends Rule {
     const d = new Set(dice);
 
     // large straight must be 5 different dice & only one can be a 1 or a 6
-    return d.size === 5 && (!d.has(1) || !d.has(6)) ? this.score : 0;
+    return d.size === 5 && (!d.has(1) || !d.has(6) || !d.has(2) || !d.has(5)) ? this.score : 0;
   };
 }
 
